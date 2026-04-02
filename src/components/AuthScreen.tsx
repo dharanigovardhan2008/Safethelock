@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { auth, db, googleProvider } from '../firebase';
 import { signInWithPopup, onAuthStateChanged, User, signOut } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { Lock, Fingerprint, LogOut, ShieldCheck } from 'lucide-react';
+import { Lock, LogOut, ShieldCheck } from 'lucide-react';
 
 export default function AuthScreen({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -76,23 +76,20 @@ export default function AuthScreen({ children }: { children: React.ReactNode }) 
     setAuthStatus('login');
   };
 
-  const handleFingerprint = () => {
-    // True WebAuthn (Fingerprint) requires complex browser APIs. 
-    // This is a placeholder for standard browser biometric prompts.
-    alert("Biometric WebAuthn requires HTTPS and passkey setup. Coming soon!");
-  };
-
   // --- RENDERING SCREENS ---
   if (authStatus === 'loading') {
-    return <div className="min-h-screen bg-gray-950 flex items-center justify-center text-white">Loading Security...</div>;
+    return <div className="min-h-screen bg-slate-950 flex items-center justify-center text-white">Loading Security...</div>;
   }
 
   // 1. App is unlocked! Show the actual Safe app
   if (authStatus === 'unlocked') {
     return (
-      <div className="relative min-h-screen bg-gray-950 text-white">
-        <button onClick={handleLogout} className="absolute top-4 right-4 flex items-center gap-2 text-gray-400 hover:text-white transition">
-          <LogOut size={18} /> Logout
+      <div className="relative min-h-screen bg-slate-950 text-white">
+        <button 
+          onClick={handleLogout} 
+          className="absolute top-6 right-6 z-50 flex items-center gap-2 bg-slate-900/80 hover:bg-slate-800 px-4 py-2 rounded-full text-slate-300 hover:text-white transition border border-white/5"
+        >
+          <LogOut size={16} /> Logout
         </button>
         {children}
       </div>
@@ -101,20 +98,27 @@ export default function AuthScreen({ children }: { children: React.ReactNode }) 
 
   // 2. Auth screens (Login, Setup PIN, Enter PIN)
   return (
-    <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center p-4 text-white">
-      <div className="bg-gray-900 border border-gray-800 p-8 rounded-2xl shadow-xl w-full max-w-md flex flex-col items-center">
+    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 text-slate-50 selection:bg-indigo-500/30 font-sans">
+      
+      {/* Background Effects matching your App */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-600/10 blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-cyan-600/10 blur-[120px]" />
+      </div>
+
+      <div className="bg-slate-900/80 backdrop-blur-xl border border-white/5 p-8 rounded-3xl shadow-2xl w-full max-w-md flex flex-col items-center relative z-10">
         
-        <div className="bg-blue-500/10 p-4 rounded-full mb-6">
-          <ShieldCheck size={48} className="text-blue-500" />
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-indigo-500/20 mb-6">
+          <ShieldCheck size={32} className="text-white" />
         </div>
 
         {authStatus === 'login' && (
           <>
-            <h1 className="text-2xl font-bold mb-2">Welcome to Safe</h1>
-            <p className="text-gray-400 mb-8 text-center">Securely store your passwords.</p>
+            <h1 className="text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60">Vaultify</h1>
+            <p className="text-slate-400 mb-8 text-center">Securely store your credentials in the cloud.</p>
             <button 
               onClick={handleGoogleLogin}
-              className="w-full bg-white text-black py-3 rounded-lg font-semibold flex items-center justify-center gap-3 hover:bg-gray-200 transition"
+              className="w-full bg-white text-slate-900 py-3.5 rounded-xl font-semibold flex items-center justify-center gap-3 hover:bg-slate-200 transition shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_25px_rgba(255,255,255,0.2)]"
             >
               <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
               Continue with Google
@@ -124,10 +128,10 @@ export default function AuthScreen({ children }: { children: React.ReactNode }) 
 
         {(authStatus === 'setup_pin' || authStatus === 'enter_pin') && (
           <div className="w-full flex flex-col items-center">
-            <h1 className="text-2xl font-bold mb-2">
+            <h1 className="text-2xl font-bold mb-2 text-white">
               {authStatus === 'setup_pin' ? 'Create a 4-Digit PIN' : 'Enter your PIN'}
             </h1>
-            <p className="text-gray-400 mb-6 text-center">
+            <p className="text-slate-400 mb-6 text-center text-sm">
               {authStatus === 'setup_pin' ? 'This secures your vault on this device.' : user?.email}
             </p>
 
@@ -136,25 +140,28 @@ export default function AuthScreen({ children }: { children: React.ReactNode }) 
               maxLength={4}
               value={pinInput}
               onChange={(e) => setPinInput(e.target.value.replace(/[^0-9]/g, ''))} // Only allow numbers
-              className="w-32 text-center text-3xl tracking-widest bg-gray-950 border border-gray-700 rounded-lg py-3 focus:outline-none focus:border-blue-500 mb-6"
+              className="w-40 text-center text-4xl tracking-[0.5em] bg-slate-950/50 border border-slate-700 rounded-xl py-4 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 mb-6 text-white font-mono placeholder:text-slate-700"
               placeholder="••••"
+              autoFocus
             />
 
-            {error && <p className="text-red-400 mb-4 text-sm">{error}</p>}
+            {error && <p className="text-rose-400 mb-4 text-sm font-medium">{error}</p>}
 
             <button 
               onClick={authStatus === 'setup_pin' ? handleSetupPin : handleVerifyPin}
-              className="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition mb-4"
+              className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500 hover:from-indigo-600 hover:to-cyan-600 py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 transition shadow-lg shadow-indigo-500/25 text-white"
             >
               <Lock size={18} />
-              {authStatus === 'setup_pin' ? 'Save PIN' : 'Unlock Safe'}
+              {authStatus === 'setup_pin' ? 'Save PIN' : 'Unlock Vault'}
             </button>
-
-            {authStatus === 'enter_pin' && (
-              <button onClick={handleFingerprint} className="text-gray-400 hover:text-white flex items-center gap-2 mt-2">
-                <Fingerprint size={20} /> Use Fingerprint
-              </button>
-            )}
+            
+            {/* Added a mini logout button here just in case they get stuck on the PIN screen */}
+            <button 
+              onClick={handleLogout} 
+              className="mt-6 text-sm text-slate-500 hover:text-slate-300 transition"
+            >
+              Sign out of {user?.email}
+            </button>
           </div>
         )}
       </div>
