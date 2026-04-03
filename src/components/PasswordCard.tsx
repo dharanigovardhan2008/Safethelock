@@ -42,8 +42,8 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
   const [isFlipped, setIsFlipped] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = async (e: React.PointerEvent) => {
-    e.stopPropagation();
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevents flipping
     e.preventDefault();
     try {
       await navigator.clipboard.writeText(password);
@@ -71,19 +71,23 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
               <span className="text-sm font-bold tracking-wider text-white/90 drop-shadow-md uppercase">{website}</span>
             </div>
             
-            {/* EDIT & DELETE BUTTONS */}
-            <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity z-50">
+            {/* FIXED: Back to standard onClick with z-[100] to ensure it sits perfectly on top */}
+            <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity z-[100] relative">
               <button 
-                onPointerDown={(e) => { e.stopPropagation(); e.preventDefault(); onEdit(id); }} 
-                onClick={(e) => e.stopPropagation()} 
+                onClick={(e) => { 
+                  e.stopPropagation(); 
+                  onEdit(id); 
+                }} 
                 className="p-2 bg-black/20 hover:bg-indigo-500/80 rounded-full text-white/70 hover:text-white transition-colors border border-white/10 backdrop-blur-sm cursor-pointer" 
                 title="Edit Password"
               >
                 <Edit2 size={16} />
               </button>
               <button 
-                onPointerDown={(e) => { e.stopPropagation(); e.preventDefault(); onDelete(id); }} 
-                onClick={(e) => e.stopPropagation()} 
+                onClick={(e) => { 
+                  e.stopPropagation(); 
+                  onDelete(id); 
+                }} 
                 className="p-2 bg-black/20 hover:bg-red-500/80 rounded-full text-white/70 hover:text-white transition-colors border border-white/10 backdrop-blur-sm cursor-pointer" 
                 title="Delete Password"
               >
@@ -131,8 +135,8 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
           <div className="px-6 py-4 flex-1 flex flex-col">
             <div className="text-[10px] uppercase tracking-widest text-white/70 mb-1 text-right w-full pointer-events-none">Authorized Signature - Not Valid Unless Signed</div>
             
-            {/* COPY BAR */}
-            <div onPointerDown={handleCopy} onClick={(e) => e.stopPropagation()} className="w-full h-10 bg-white/90 hover:bg-white rounded flex items-center justify-between px-3 relative shadow-inner cursor-pointer group/copy transition-colors z-50" title="Click to copy password">
+            {/* FIXED: Back to standard onClick for the copy bar */}
+            <div onClick={handleCopy} className="w-full h-10 bg-white/90 hover:bg-white rounded flex items-center justify-between px-3 relative shadow-inner cursor-pointer group/copy transition-colors z-[100]" title="Click to copy password">
               <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 2px, #000 2px, #000 4px)' }}></div>
               <span className="font-mono text-slate-800 font-bold tracking-wider text-sm select-all relative z-10 pointer-events-none">{password}</span>
               <div className="relative z-10 flex items-center text-slate-500 group-hover/copy:text-indigo-600 transition-colors pointer-events-none">
