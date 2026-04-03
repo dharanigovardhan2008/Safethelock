@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Wifi, Copy, Eye, EyeOff, Trash2, Key } from 'lucide-react';
+import { Wifi, Copy, Check, Trash2, Key } from 'lucide-react'; // Removed Eye/EyeOff, added Check
 import { motion } from 'framer-motion';
 import { cn } from '../utils/cn';
 import { 
@@ -55,11 +55,10 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
   onDelete,
 }) => {
   const [isFlipped, setIsFlipped] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async (e: React.MouseEvent) => {
-    e.stopPropagation(); // Stop card from flipping back
+    e.stopPropagation(); // Stops the card from flipping back over
     try {
       await navigator.clipboard.writeText(password);
       setCopied(true);
@@ -69,13 +68,8 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
     }
   };
 
-  const togglePassword = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Stop card from flipping back
-    setShowPassword(!showPassword);
-  };
-  
   const handleDelete = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Stop card from flipping
+    e.stopPropagation();
     onDelete(id);
   };
 
@@ -83,9 +77,8 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
 
   return (
     <div 
-      className="relative group w-[340px] h-[215px] cursor-pointer transition-transform duration-300 hover:-translate-y-2" 
+      className="relative group w-[340px] h-[215px] transition-transform duration-300 hover:-translate-y-2" 
       style={{ perspective: '1000px' }}
-      {/* REMOVED ONCLICK FROM HERE */}
     >
       <motion.div
         className="w-full h-full relative rounded-2xl shadow-2xl group-hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] transition-shadow duration-300"
@@ -96,9 +89,9 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
       >
         {/* ================= FRONT SIDE ================= */}
         <div
-          onClick={() => setIsFlipped(true)} // FLIP TO BACK
+          onClick={() => setIsFlipped(true)}
           className={cn(
-            "absolute inset-0 rounded-2xl p-6 flex flex-col justify-between overflow-hidden",
+            "absolute inset-0 rounded-2xl p-6 flex flex-col justify-between overflow-hidden cursor-pointer",
             gradient
           )}
           style={{ backfaceVisibility: 'hidden' }}
@@ -172,9 +165,9 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
 
         {/* ================= BACK SIDE ================= */}
         <div
-          onClick={() => setIsFlipped(false)} // FLIP BACK TO FRONT
+          onClick={() => setIsFlipped(false)}
           className={cn(
-            "absolute inset-0 rounded-2xl flex flex-col overflow-hidden border border-white/10",
+            "absolute inset-0 rounded-2xl flex flex-col overflow-hidden border border-white/10 cursor-pointer",
             gradient
           )}
           style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
@@ -186,38 +179,31 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
               Authorized Signature - Not Valid Unless Signed
             </div>
             
-            <div className="w-full h-10 bg-white/90 rounded flex items-center px-3 relative shadow-inner cursor-default" onClick={(e) => e.stopPropagation()}>
+            {/* ENTIRE WHITE BOX IS NOW THE COPY BUTTON */}
+            <div 
+              onClick={handleCopy}
+              className="w-full h-10 bg-white/90 hover:bg-white rounded flex items-center justify-between px-3 relative shadow-inner cursor-copy group/copy transition-colors"
+              title="Click to copy password"
+            >
+              {/* Security Pattern */}
               <div className="absolute inset-0 opacity-10 pointer-events-none" 
                    style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 2px, #000 2px, #000 4px)' }}>
               </div>
               
-              <div className="ml-auto bg-slate-100 px-3 py-1 rounded border border-slate-300 flex items-center space-x-3 relative z-50">
-                <span className="font-mono text-slate-800 font-bold tracking-wider text-sm select-all">
-                  {showPassword ? password : '•'.repeat(password.length)}
-                </span>
+              {/* The actual password shown in plain text */}
+              <span className="font-mono text-slate-800 font-bold tracking-wider text-sm select-all relative z-10">
+                {password}
+              </span>
+              
+              {/* Copy Icon / Checkmark */}
+              <div className="relative z-10 flex items-center text-slate-500 group-hover/copy:text-indigo-600 transition-colors">
+                {copied ? <Check size={16} className="text-emerald-600" /> : <Copy size={16} />}
                 
-                <div className="flex items-center space-x-1 border-l border-slate-300 pl-2 relative z-50">
-                  <button 
-                    onClick={togglePassword}
-                    className="p-2 text-slate-600 hover:text-indigo-600 hover:bg-slate-200 rounded transition-colors relative z-[100] cursor-pointer active:scale-95"
-                    title={showPassword ? "Hide password" : "Show password"}
-                  >
-                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-
-                  <button 
-                    onClick={handleCopy}
-                    className="p-2 text-slate-600 hover:text-indigo-600 hover:bg-slate-200 rounded transition-colors relative z-[100] cursor-pointer active:scale-95"
-                    title="Copy password"
-                  >
-                    <Copy size={16} />
-                    {copied && (
-                      <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] px-2 py-1 rounded shadow-lg pointer-events-none">
-                        Copied!
-                      </span>
-                    )}
-                  </button>
-                </div>
+                {copied && (
+                  <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] px-2 py-1 rounded shadow-lg pointer-events-none">
+                    Copied!
+                  </span>
+                )}
               </div>
             </div>
             
