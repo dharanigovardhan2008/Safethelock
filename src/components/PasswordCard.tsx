@@ -89,7 +89,6 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
 
           <div className="absolute inset-0 p-5 flex flex-col z-10 pointer-events-none">
             
-            {/* Header */}
             <div className="flex justify-between items-start">
               <div className="flex items-center space-x-2.5 drop-shadow-lg">
                 <div className="p-1.5 bg-white/10 backdrop-blur-md rounded-lg border border-white/20 shadow-inner">
@@ -111,7 +110,6 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
               )}
             </div>
 
-            {/* Chip & Numbers */}
             <div className="flex flex-col mt-4">
               <div className="flex items-center space-x-4 mb-2 pl-1">
                 <div className="w-[46px] h-[34px] rounded-md bg-gradient-to-br from-[#d4af37] via-[#fff4cc] to-[#996515] p-[1px] shadow-[0_2px_5px_rgba(0,0,0,0.4)] relative overflow-hidden">
@@ -126,14 +124,21 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
                 <Wifi size={28} className="text-white/70 rotate-90 drop-shadow-md" strokeWidth={2.5} />
               </div>
               
-              <div className="font-sans font-bold text-[22px] tracking-[0.2em] whitespace-nowrap text-[#f8f9fa] h-[30px] flex items-center pl-1 opacity-95"
-                   style={embossedText}>
+              <div className="font-sans font-bold text-[22px] tracking-[0.2em] whitespace-nowrap text-[#f8f9fa] h-[30px] flex items-center pl-1 opacity-95" style={embossedText}>
                 •••• •••• •••• ••••
               </div>
             </div>
 
-            {/* FIXED: Date moved up, underneath the numbers like a real credit card! */}
-            <div className="flex justify-center w-full pl-[50px] mt-1">
+            {/* BOTTOM ROW: Name (Left), Date (Middle-Right), Logo (Far Right) */}
+            {/* Added pr-[70px] so the text stops before hitting the Logo */}
+            <div className="flex justify-between items-end mt-auto mb-1 pl-1 pr-[70px]">
+              <div className="flex flex-col">
+                <span className="text-[7.5px] uppercase tracking-[0.25em] text-white/60 mb-0.5 font-bold drop-shadow-sm">Cardholder</span>
+                <span className="font-sans text-[15px] font-bold tracking-[0.1em] text-[#f8f9fa] uppercase truncate max-w-[130px] opacity-95" style={embossedText}>
+                  {formattedName}
+                </span>
+              </div>
+              
               <div className="flex items-center space-x-2">
                 <div className="flex flex-col text-[6px] uppercase tracking-[0.2em] text-white/70 font-bold text-right leading-[8px] drop-shadow-sm">
                   <span>Valid</span>
@@ -144,15 +149,8 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
                 </span>
               </div>
             </div>
-
-            {/* Bottom Row: Name on Left, Logo handled via absolute CSS */}
-            <div className="flex flex-col mt-auto mb-1 pl-1 pr-[85px]">
-              <span className="text-[7.5px] uppercase tracking-[0.25em] text-white/60 mb-0.5 font-bold drop-shadow-sm">Cardholder</span>
-              <span className="font-sans text-[15px] font-bold tracking-[0.1em] text-[#f8f9fa] uppercase truncate w-full opacity-95" style={embossedText}>
-                {formattedName}
-              </span>
-            </div>
             
+            {/* THE LOGO - Pinned to absolute bottom right */}
             <div className="absolute bottom-5 right-5 z-0 pointer-events-none flex items-center drop-shadow-lg opacity-90">
               <div className="w-10 h-10 rounded-full bg-red-500/80 mix-blend-multiply"></div>
               <div className="w-10 h-10 rounded-full bg-yellow-400/80 mix-blend-multiply -ml-4"></div>
