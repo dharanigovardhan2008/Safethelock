@@ -62,12 +62,10 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
     }
   };
 
-  // Realistic embossing CSS trick
   const embossedText = {
     textShadow: '0px 1px 1px rgba(255,255,255,0.3), 0px -1px 1px rgba(0,0,0,0.8)'
   };
 
-  // Format username to look like a real person's name on a card
   const formattedName = username.split('@')[0].replace(/[^a-zA-Z ]/g, ' ').trim().toUpperCase() || 'VAULT USER';
 
   return (
@@ -79,13 +77,9 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
         {/* ================= FRONT SIDE ================= */}
         <div onClick={() => handleCardClick(true)} className={cn("absolute inset-0 rounded-2xl overflow-hidden cursor-pointer", gradient)} style={{ backfaceVisibility: 'hidden' }}>
           
-          {/* Authentic Plastic/Metal Base Texture */}
           <div className="absolute inset-0 opacity-20 mix-blend-overlay pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 50% 0%, #ffffff 0%, transparent 70%)' }}></div>
-          
-          {/* Diagonal Light Reflection (Glare) */}
           <div className="absolute inset-0 opacity-40 pointer-events-none" style={{ background: 'linear-gradient(115deg, transparent 20%, rgba(255,255,255,0.3) 25%, transparent 35%, transparent 45%, rgba(255,255,255,0.1) 50%, transparent 60%)' }}></div>
 
-          {/* EDIT MODE OVERLAY */}
           {isEditMode && (
             <div className="absolute inset-0 z-[9999] bg-slate-950/80 backdrop-blur-md flex flex-col items-center justify-center border-[3px] border-indigo-400 rounded-2xl animate-in fade-in duration-200 shadow-[inset_0_0_50px_rgba(99,102,241,0.3)]">
               <div className="bg-indigo-500 p-4 rounded-full shadow-[0_0_30px_rgba(99,102,241,0.6)] mb-3"><Edit2 size={28} className="text-white" /></div>
@@ -93,9 +87,9 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
             </div>
           )}
 
-          <div className="absolute inset-0 p-5 flex flex-col justify-between z-10 pointer-events-none">
+          <div className="absolute inset-0 p-5 flex flex-col z-10 pointer-events-none">
             
-            {/* BANK LOGO AREA (Top) */}
+            {/* Header */}
             <div className="flex justify-between items-start">
               <div className="flex items-center space-x-2.5 drop-shadow-lg">
                 <div className="p-1.5 bg-white/10 backdrop-blur-md rounded-lg border border-white/20 shadow-inner">
@@ -106,7 +100,6 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
                 </span>
               </div>
               
-              {/* DELETE BUTTON */}
               {!isEditMode && (
                 <button 
                   onPointerDownCapture={(e) => { e.stopPropagation(); onDelete(id); }}
@@ -118,13 +111,11 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
               )}
             </div>
 
-            {/* REALISTIC CHIP & CONTACTLESS */}
-            <div className="flex flex-col mt-6">
-              <div className="flex items-center space-x-4 mb-3 pl-1">
-                {/* Metallic Chip */}
+            {/* Chip & Numbers */}
+            <div className="flex flex-col mt-4">
+              <div className="flex items-center space-x-4 mb-2 pl-1">
                 <div className="w-[46px] h-[34px] rounded-md bg-gradient-to-br from-[#d4af37] via-[#fff4cc] to-[#996515] p-[1px] shadow-[0_2px_5px_rgba(0,0,0,0.4)] relative overflow-hidden">
                   <div className="absolute inset-[1px] rounded-[5px] bg-gradient-to-br from-[#e8c871] to-[#c99a2e] border border-[#8b6508]/50 shadow-inner"></div>
-                  {/* Circuit Lines */}
                   <div className="absolute top-[25%] left-0 w-full h-[1px] bg-[#755000]/40 shadow-[0_1px_0_rgba(255,255,255,0.4)]"></div>
                   <div className="absolute top-[50%] left-0 w-full h-[1px] bg-[#755000]/40 shadow-[0_1px_0_rgba(255,255,255,0.4)]"></div>
                   <div className="absolute top-[75%] left-0 w-full h-[1px] bg-[#755000]/40 shadow-[0_1px_0_rgba(255,255,255,0.4)]"></div>
@@ -132,26 +123,17 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
                   <div className="absolute top-0 right-[35%] w-[1px] h-full bg-[#755000]/40 shadow-[1px_0_0_rgba(255,255,255,0.4)]"></div>
                   <div className="absolute top-[30%] left-[30%] right-[30%] bottom-[30%] border border-[#755000]/40 rounded-sm"></div>
                 </div>
-                {/* Contactless Icon */}
                 <Wifi size={28} className="text-white/70 rotate-90 drop-shadow-md" strokeWidth={2.5} />
               </div>
               
-              {/* EMBOSSED CARD NUMBERS */}
-              <div className="font-mono text-[24px] tracking-[0.25em] text-[#f8f9fa] h-[30px] flex items-center pl-1 font-semibold opacity-95"
+              <div className="font-sans font-bold text-[22px] tracking-[0.2em] whitespace-nowrap text-[#f8f9fa] h-[30px] flex items-center pl-1 opacity-95"
                    style={embossedText}>
                 •••• •••• •••• ••••
               </div>
             </div>
 
-            {/* CARDHOLDER & EXPIRY */}
-            <div className="flex justify-between items-end mt-2 pl-1 pr-2">
-              <div className="flex flex-col">
-                <span className="text-[7.5px] uppercase tracking-[0.25em] text-white/60 mb-1 font-bold drop-shadow-sm">Cardholder</span>
-                <span className="font-sans text-[15px] font-bold tracking-[0.1em] text-[#f8f9fa] uppercase truncate max-w-[190px] opacity-95" style={embossedText}>
-                  {formattedName}
-                </span>
-              </div>
-              
+            {/* FIXED: Date moved up, underneath the numbers like a real credit card! */}
+            <div className="flex justify-center w-full pl-[50px] mt-1">
               <div className="flex items-center space-x-2">
                 <div className="flex flex-col text-[6px] uppercase tracking-[0.2em] text-white/70 font-bold text-right leading-[8px] drop-shadow-sm">
                   <span>Valid</span>
@@ -162,8 +144,15 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
                 </span>
               </div>
             </div>
+
+            {/* Bottom Row: Name on Left, Logo handled via absolute CSS */}
+            <div className="flex flex-col mt-auto mb-1 pl-1 pr-[85px]">
+              <span className="text-[7.5px] uppercase tracking-[0.25em] text-white/60 mb-0.5 font-bold drop-shadow-sm">Cardholder</span>
+              <span className="font-sans text-[15px] font-bold tracking-[0.1em] text-[#f8f9fa] uppercase truncate w-full opacity-95" style={embossedText}>
+                {formattedName}
+              </span>
+            </div>
             
-            {/* AUTHENTIC PAYMENT NETWORK LOGO (Mastercard Style) */}
             <div className="absolute bottom-5 right-5 z-0 pointer-events-none flex items-center drop-shadow-lg opacity-90">
               <div className="w-10 h-10 rounded-full bg-red-500/80 mix-blend-multiply"></div>
               <div className="w-10 h-10 rounded-full bg-yellow-400/80 mix-blend-multiply -ml-4"></div>
@@ -175,23 +164,15 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
 
         {/* ================= BACK SIDE ================= */}
         <div onClick={() => handleCardClick(false)} className={cn("absolute inset-0 rounded-2xl flex flex-col overflow-hidden cursor-pointer ring-1 ring-white/20", gradient)} style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
-          
           <div className="absolute inset-0 bg-black/20 pointer-events-none backdrop-blur-[2px]"></div>
-
-          {/* GLOSSY MAGNETIC STRIPE */}
           <div className="w-full h-12 bg-gradient-to-b from-[#111] via-[#0a0a0a] to-[#1a1a1a] mt-5 shadow-[0_2px_4px_rgba(0,0,0,0.5)] pointer-events-none z-10 border-t border-b border-black"></div>
 
           <div className="px-5 py-3 flex-1 flex flex-col relative z-10">
-            
-            {/* Customer Service Text */}
             <div className="text-[7px] uppercase tracking-widest text-white/60 w-full pointer-events-none font-bold mb-2">
               Customer Service: +1 (800) VAULT-SECURE
             </div>
             
-            {/* SECURE SIGNATURE STRIP (COPY BUTTON) */}
             <div className="flex w-full h-[42px] relative z-[100] shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]">
-              
-              {/* Signature Box */}
               <div className="flex-1 bg-[#f0f0f0] rounded-l-sm relative overflow-hidden flex items-center px-3 border border-r-0 border-gray-400 pointer-events-none">
                 <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, #000, #000 1px, transparent 1px, transparent 6px)' }}></div>
                 <div className="text-[9px] uppercase tracking-widest text-gray-400 font-bold absolute top-1 left-2 italic">Authorized Signature</div>
@@ -200,19 +181,15 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
                 </span>
               </div>
               
-              {/* CVV Copy Button Box */}
               <div onPointerDownCapture={handleCopy} className="w-16 bg-white rounded-r-sm border border-gray-400 flex items-center justify-center cursor-pointer hover:bg-blue-50 transition-colors group/copy relative">
                 <div className="absolute -top-4 text-[7px] font-black text-white/80 tracking-widest">CVV</div>
                 {copied ? <Check size={18} className="text-emerald-600" /> : <Copy size={16} className="text-slate-400 group-hover/copy:text-blue-600 transition-colors" />}
                 {copied && <span className="absolute -top-8 bg-slate-800 text-white text-[10px] px-2 py-1 rounded shadow-lg font-sans font-medium tracking-normal whitespace-nowrap">Copied!</span>}
               </div>
-
             </div>
             
-            {/* Holographic Security Sticker */}
             <div className="absolute bottom-4 left-5 w-10 h-7 rounded bg-gradient-to-tr from-pink-400 via-yellow-200 to-cyan-400 opacity-60 mix-blend-overlay shadow-inner pointer-events-none" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255,255,255,0.2) 2px, rgba(255,255,255,0.2) 4px)' }}></div>
 
-            {/* Legal Text */}
             <div className="mt-auto text-[6.5px] text-white/50 text-center uppercase tracking-widest leading-relaxed pointer-events-none font-bold max-w-[260px] mx-auto opacity-70">
               This card is issued by Vaultify Security. Use constitutes acceptance of terms. If found, please destroy or return to secure location.
             </div>
