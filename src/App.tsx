@@ -115,7 +115,6 @@ function VaultApp() {
       <header className="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-xl border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           
-          {/* Logo Area */}
           <div className="flex items-center space-x-3 shrink-0">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-indigo-500/20 shrink-0">
               <Shield className="text-white" size={24} />
@@ -126,49 +125,45 @@ function VaultApp() {
             </div>
           </div>
           
-          {/* Actions Area */}
-          <div className="flex items-center gap-2 md:gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             
-            {/* Search Bar - Hidden on mobile/tablet, visible on large desktop */}
             <div className="relative hidden lg:block mr-2">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><Search size={16} className="text-slate-500" /></div>
               <input type="text" placeholder="Search vault..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-48 xl:w-64 pl-10 pr-4 py-2 bg-slate-900/50 border border-slate-800 rounded-full text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all" />
             </div>
 
-            {/* Edit Button - Perfect circle on mobile, expanded on desktop */}
+            {/* FIXED: PERFECT CIRCLES ON MOBILE */}
             {passwords.length > 0 && (
               <button 
                 onClick={() => setIsEditMode(!isEditMode)} 
-                className={`flex items-center justify-center w-10 h-10 md:w-auto md:h-auto md:px-4 md:py-2 rounded-full font-semibold transition-all shrink-0
+                className={`flex items-center justify-center w-10 h-10 sm:w-auto sm:px-4 sm:py-2 rounded-full font-semibold transition-all shrink-0
                   ${isEditMode 
-                    ? 'bg-indigo-500 text-white shadow-[0_0_15px_rgba(99,102,241,0.4)] ring-2 ring-indigo-400 ring-offset-2 ring-offset-slate-950' 
+                    ? 'bg-indigo-500 text-white shadow-[0_0_15px_rgba(99,102,241,0.4)] ring-2 ring-indigo-400' 
                     : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700'}
                 `}
                 title="Edit Vault"
               >
                 {isEditMode ? <Check size={18} strokeWidth={2.5} /> : <Edit2 size={18} strokeWidth={2.5} />}
-                <span className="hidden md:inline ml-2 text-sm">{isEditMode ? 'Done' : 'Edit'}</span>
+                <span className="hidden sm:inline ml-2 text-sm">{isEditMode ? 'Done' : 'Edit'}</span>
               </button>
             )}
             
-            {/* Add Button - Perfect circle on mobile, expanded on desktop */}
             <button 
               onClick={() => { setEditingPassword(null); setIsModalOpen(true); }} 
-              className="flex items-center justify-center w-10 h-10 md:w-auto md:h-auto md:px-4 md:py-2 bg-white text-slate-900 hover:bg-slate-200 rounded-full transition-colors shadow-[0_0_20px_rgba(255,255,255,0.1)] shrink-0"
+              className="flex items-center justify-center w-10 h-10 sm:w-auto sm:px-4 sm:py-2 bg-white text-slate-900 hover:bg-slate-200 rounded-full transition-colors shadow-[0_0_20px_rgba(255,255,255,0.1)] shrink-0"
               title="Add New"
             >
               <Plus size={18} strokeWidth={2.5} />
-              <span className="hidden md:inline ml-2 text-sm font-semibold">Add New</span>
+              <span className="hidden sm:inline ml-2 text-sm font-semibold">Add New</span>
             </button>
 
-            {/* Logout Button - Perfect circle on mobile, expanded on desktop */}
             <button 
               onClick={handleLogout} 
-              className="flex items-center justify-center w-10 h-10 md:w-auto md:h-auto md:px-4 md:py-2 bg-slate-900 hover:bg-slate-800 text-rose-400 hover:text-rose-300 rounded-full transition-colors border border-slate-800 shrink-0 ml-1 md:ml-2"
+              className="flex items-center justify-center w-10 h-10 sm:w-auto sm:px-4 sm:py-2 bg-slate-900 hover:bg-slate-800 text-rose-400 hover:text-rose-300 rounded-full transition-colors border border-slate-800 shrink-0"
               title="Logout"
             >
               <LogOut size={18} />
-              <span className="hidden md:inline ml-2 text-sm font-semibold">Logout</span>
+              <span className="hidden sm:inline ml-2 text-sm font-semibold">Logout</span>
             </button>
 
           </div>
@@ -176,7 +171,6 @@ function VaultApp() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
-        {/* Mobile Search Bar - Shows up here since it's hidden in the header */}
         <div className="lg:hidden mb-8 relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><Search size={18} className="text-slate-500" /></div>
           <input type="text" placeholder="Search vault..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-800 rounded-2xl text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50" />
