@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { auth, db, googleProvider } from '../firebase';
 import { signInWithPopup, onAuthStateChanged, User, signOut } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { LogOut, ShieldCheck } from 'lucide-react';
+import { Lock, ShieldCheck } from 'lucide-react';
 
 export default function AuthScreen({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -10,7 +10,6 @@ export default function AuthScreen({ children }: { children: React.ReactNode }) 
   const [pinInput, setPinInput] = useState('');
   const [error, setError] = useState('');
 
-  // 1. Listen for user login status
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
@@ -29,10 +28,8 @@ export default function AuthScreen({ children }: { children: React.ReactNode }) 
     return () => unsubscribe();
   }, []);
 
-  // 2. AUTO-VERIFY MAGIC: Watch the pinInput. When it hits 4 digits, check it!
   useEffect(() => {
     if (pinInput.length === 4) {
-      // Add a tiny 150ms delay so the user can visually see the 4th dot fill up
       const timer = setTimeout(() => {
         if (authStatus === 'setup_pin') {
           handleSetupPin(pinInput);
@@ -40,7 +37,6 @@ export default function AuthScreen({ children }: { children: React.ReactNode }) 
           handleVerifyPin(pinInput);
         }
       }, 150);
-      
       return () => clearTimeout(timer);
     }
   }, [pinInput, authStatus]);
@@ -53,7 +49,6 @@ export default function AuthScreen({ children }: { children: React.ReactNode }) 
     }
   };
 
-  // Note: We now pass the PIN directly into these functions
   const handleSetupPin = async (pinToSave: string) => {
     if (!user) return;
     try {
@@ -62,7 +57,7 @@ export default function AuthScreen({ children }: { children: React.ReactNode }) 
       setPinInput('');
     } catch (err) {
       setError("Error saving PIN");
-      setPinInput(''); // Clear input so they can try again
+      setPinInput('');
     }
   };
 
@@ -76,7 +71,7 @@ export default function AuthScreen({ children }: { children: React.ReactNode }) 
         setError('');
       } else {
         setError("Incorrect PIN");
-        setPinInput(''); // Automatically clear the dots if wrong!
+        setPinInput('');
       }
     } catch (err) {
       setError("Error verifying PIN");
@@ -89,7 +84,6 @@ export default function AuthScreen({ children }: { children: React.ReactNode }) 
     setAuthStatus('login');
   };
 
-  // --- RENDERING SCREENS ---
   if (authStatus === 'loading') {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white space-y-4">
@@ -99,15 +93,10 @@ export default function AuthScreen({ children }: { children: React.ReactNode }) 
     );
   }
 
+  // FIXED: The floating Logout button is completely gone! 
+  // It just returns the main app now, because App.tsx handles the header.
   if (authStatus === 'unlocked') {
-    return (
-      <div className="relative min-h-screen bg-slate-950 text-white">
-        <button onClick={handleLogout} className="absolute top-6 right-6 z-50 flex items-center gap-2 bg-slate-900/80 hover:bg-slate-800 px-4 py-2 rounded-full text-slate-300 hover:text-white transition border border-white/5 shadow-lg">
-          <LogOut size={16} /> Logout
-        </button>
-        {children}
-      </div>
-    );
+    return <>{children}</>;
   }
 
   return (
@@ -143,18 +132,7 @@ export default function AuthScreen({ children }: { children: React.ReactNode }) 
             </p>
 
             <div className="relative flex gap-3 sm:gap-4 justify-center mb-6">
-              <input 
-                type="tel" 
-                maxLength={4} 
-                value={pinInput} 
-                onChange={(e) => { 
-                  setError(''); 
-                  setPinInput(e.target.value.replace(/[^0-9]/g, '')); 
-                }} 
-                className="absolute inset-0 w-full h-full opacity-0 cursor-text z-20" 
-                autoFocus 
-              />
-              
+              <input type="tel" maxLength={4} value={pinInput} onChange={(e) => { setError(''); setPinInput(e.target.value.replace(/[^0-9]/g, '')); }} className="absolute inset-0 w-full h-full opacity-0 cursor-text z-20" autoFocus />
               {[0, 1, 2, 3].map((index) => {
                 const isFilled = pinInput.length > index;
                 const isActive = pinInput.length === index;
@@ -166,12 +144,10 @@ export default function AuthScreen({ children }: { children: React.ReactNode }) 
               })}
             </div>
 
-            {/* Error Message Space (kept height consistent so layout doesn't jump) */}
             <div className="h-6 mb-4">
               {error && <p className="text-rose-400 text-sm font-medium animate-in slide-in-from-top-2">{error}</p>}
             </div>
 
-            {/* Replaced the button with a clean logout link directly below the PIN */}
             <button onClick={handleLogout} className="text-sm text-slate-500 hover:text-slate-300 transition">
               Not {user?.email?.split('@')[0]}? Sign out
             </button>
