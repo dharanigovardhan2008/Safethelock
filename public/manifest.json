@@ -1,0 +1,8 @@
+{
+  "name": "Vaultify",
+  "short_name": "Vaultify",
+  "description": "Secure Password Manager",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  
