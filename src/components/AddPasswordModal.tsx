@@ -1,11 +1,6 @@
-import React, { useState } from 'react';
-import { X, Save, Lock, User, Globe, AlertCircle } from 'lucide-react';
-
-interface AddPasswordModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSave: (data: Omit<PasswordData, 'id' | 'dateAdded' | 'gradient'>) => void;
-}
+import React, { useState, useEffect } from 'react';
+import { X, Save, Lock, User, Globe, AlertCircle, Palette } from 'lucide-react';
+import { cn } from '../utils/cn';
 
 export interface PasswordData {
   id: string;
@@ -16,6 +11,15 @@ export interface PasswordData {
   gradient: string;
 }
 
+interface AddPasswordModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  // Notice we now pass the 'id' and 'gradient' to support Editing and Colors!
+  onSave: (data: Omit<PasswordData, 'dateAdded'>) => void; 
+  editingPassword?: PasswordData | null; // NEW: Receives data if we are editing
+}
+
+// Your beautiful premium gradients!
 const GRADIENTS = [
   'bg-gradient-to-br from-gray-900 via-black to-gray-800', // Midnight Black
   'bg-gradient-to-tr from-blue-900 via-blue-800 to-blue-950', // Royal Blue
@@ -30,11 +34,31 @@ export const AddPasswordModal: React.FC<AddPasswordModalProps> = ({
   isOpen,
   onClose,
   onSave,
+  editingPassword,
 }) => {
   const [website, setWebsite] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [selectedGradient, setSelectedGradient] = useState(GRADIENTS[0]);
   const [error, setError] = useState('');
+
+  // NEW: When the modal opens, check if we are editing or adding new!
+  useEffect(() => {
+    if (editingPassword) {
+      // We are EDITING: Pre-fill all the fields with the existing data
+      setWebsite(editingPassword.website);
+      setUsername(editingPassword.username);
+      setPassword(editingPassword.password);
+      setSelectedGradient(editingPassword.gradient || GRADIENTS[0]);
+    } else {
+      // We are ADDING NEW: Clear the fields and pick a random default color
+      setWebsite('');
+      setUsername('');
+      setPassword('');
+      setSelectedGradient(GRADIENTS[Math.floor(Math.random() * GRADIENTS.length)]);
+    }
+    setError('');
+  }, [editingPassword, isOpen]);
 
   if (!isOpen) return null;
 
@@ -45,13 +69,15 @@ export const AddPasswordModal: React.FC<AddPasswordModalProps> = ({
       return;
     }
     
-    onSave({ website, username, password });
+    // Save the data (If editing, pass the existing ID. If new, pass empty string)
+    onSave({ 
+      id: editingPassword ? editingPassword.id : '',
+      website, 
+      username, 
+      password,
+      gradient: selectedGradient
+    });
     
-    // Reset form
-    setWebsite('');
-    setUsername('');
-    setPassword('');
-    setError('');
     onClose();
   };
 
@@ -71,7 +97,8 @@ export const AddPasswordModal: React.FC<AddPasswordModalProps> = ({
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-semibold text-white flex items-center">
               <Lock className="mr-2 text-indigo-400" size={20} />
-              Add Credentials
+              {/* Dynamic Title */}
+              {editingPassword ? 'Edit Credentials' : 'Add Credentials'}
             </h2>
             <button
               onClick={onClose}
@@ -137,12 +164,37 @@ export const AddPasswordModal: React.FC<AddPasswordModalProps> = ({
                 </div>
                 <input
                   id="password"
-                  type="password"
+                  type="text"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   className="block w-full pl-10 pr-3 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow font-mono"
                 />
+              </div>
+            </div>
+
+            {/* NEW: THE COLOR PICKER! */}
+            <div className="space-y-2 pt-2">
+              <label className="text-sm font-medium text-slate-300 flex items-center gap-2">
+                <Palette size={14} className="text-slate-400" />
+                Card Color
+              </label>
+              <div className="flex gap-3 justify-center bg-slate-950/30 p-3 rounded-xl border border-slate-800/50">
+                {GRADIENTS.map((gradient) => (
+                  <button
+                    key={gradient}
+                    type="button"
+                    onClick={() => setSelectedGradient(gradient)}
+                    className={cn(
+                      "w-8 h-8 rounded-full transition-all duration-200 border-2",
+                      gradient, // Applies your specific tailwind color class
+                      selectedGradient === gradient 
+                        ? 'border-white scale-110 shadow-[0_0_15px_rgba(255,255,255,0.3)]' 
+                        : 'border-transparent opacity-40 hover:opacity-100 hover:scale-105'
+                    )}
+                    title="Select color"
+                  />
+                ))}
               </div>
             </div>
             
@@ -159,7 +211,8 @@ export const AddPasswordModal: React.FC<AddPasswordModalProps> = ({
                 className="flex items-center space-x-2 px-5 py-2 text-sm font-medium text-white bg-indigo-500 hover:bg-indigo-600 rounded-lg shadow-lg shadow-indigo-500/20 transition-all active:scale-95"
               >
                 <Save size={16} />
-                <span>Save Securely</span>
+                {/* Dynamic Button Text */}
+                <span>{editingPassword ? 'Save Changes' : 'Save Securely'}</span>
               </button>
             </div>
           </form>
@@ -168,6 +221,3 @@ export const AddPasswordModal: React.FC<AddPasswordModalProps> = ({
     </div>
   );
 };
-
-// Export random gradient helper for use in App.tsx
-export const getRandomGradient = () => GRADIENTS[Math.floor(Math.random() * GRADIENTS.length)];
