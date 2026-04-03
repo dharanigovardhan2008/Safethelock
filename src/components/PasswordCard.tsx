@@ -58,9 +58,10 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // FIXED: Added strict e.stopPropagation() and async clipboard API
-  const handleCopy = async (e: React.MouseEvent) => {
-    e.stopPropagation(); // Stops the card from flipping!
+  // FIXED: Using onPointerDown is bulletproof for 3D elements
+  const handleCopy = async (e: React.MouseEvent | React.PointerEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     try {
       await navigator.clipboard.writeText(password);
       setCopied(true);
@@ -70,15 +71,15 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
     }
   };
 
-  // FIXED: Stops the card from flipping when clicking the eye icon
-  const togglePassword = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Stops the card from flipping!
+  const togglePassword = (e: React.MouseEvent | React.PointerEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     setShowPassword(!showPassword);
   };
   
-  // FIXED: Stops the card from flipping when clicking delete
-  const handleDelete = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Stops the card from flipping!
+  const handleDelete = (e: React.MouseEvent | React.PointerEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     onDelete(id);
   };
 
@@ -88,14 +89,14 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
     <div 
       className="relative group w-[340px] h-[215px] cursor-pointer transition-transform duration-300 hover:-translate-y-2" 
       onClick={() => setIsFlipped(!isFlipped)}
-      style={{ perspective: '1000px' }} // Guaranteed 3D perspective
+      style={{ perspective: '1000px' }}
     >
       <motion.div
         className="w-full h-full relative rounded-2xl shadow-2xl group-hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] transition-shadow duration-300"
         initial={false}
         animate={{ rotateY: isFlipped ? 180 : 0 }}
         transition={{ duration: 0.6, type: "spring", stiffness: 260, damping: 20 }}
-        style={{ transformStyle: 'preserve-3d' }} // Guaranteed 3D rendering
+        style={{ transformStyle: 'preserve-3d' }}
       >
         {/* ================= FRONT SIDE ================= */}
         <div
@@ -103,7 +104,7 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
             "absolute inset-0 rounded-2xl p-6 flex flex-col justify-between overflow-hidden",
             gradient
           )}
-          style={{ backfaceVisibility: 'hidden' }} // Guaranteed to hide back when flipped
+          style={{ backfaceVisibility: 'hidden' }}
         >
           <div className="absolute inset-0 bg-gradient-to-tr from-white/10 via-white/5 to-transparent pointer-events-none mix-blend-overlay"></div>
           <div className="absolute -inset-[100%] bg-gradient-to-br from-transparent via-white/20 to-transparent rotate-45 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 pointer-events-none"></div>
@@ -116,9 +117,11 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
               </span>
             </div>
             
+            {/* Added bulletproof interaction here too */}
             <button 
-              onClick={handleDelete}
-              className="p-2 bg-black/20 hover:bg-red-500/80 rounded-full text-white/70 hover:text-white transition-colors opacity-0 group-hover:opacity-100 border border-white/10 backdrop-blur-sm z-20"
+              onPointerDown={handleDelete}
+              onClick={(e) => e.stopPropagation()}
+              className="p-2 bg-black/20 hover:bg-red-500/80 rounded-full text-white/70 hover:text-white transition-colors opacity-0 group-hover:opacity-100 border border-white/10 backdrop-blur-sm z-50 cursor-pointer"
               title="Delete Password"
             >
               <Trash2 size={16} />
@@ -178,7 +181,7 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
             "absolute inset-0 rounded-2xl flex flex-col overflow-hidden border border-white/10",
             gradient
           )}
-          style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }} // Guaranteed to flip correctly
+          style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
         >
           <div className="w-full h-12 bg-gray-900/90 mt-6 shadow-inner"></div>
 
@@ -192,22 +195,27 @@ export const PasswordCard: React.FC<PasswordCardProps> = ({
                    style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 2px, #000 2px, #000 4px)' }}>
               </div>
               
-              <div className="ml-auto bg-slate-100 px-3 py-1 rounded border border-slate-300 flex items-center space-x-3 z-10">
+              {/* FIXED: Added z-50 and relative positioning to ensure buttons stay on top */}
+              <div className="ml-auto bg-slate-100 px-3 py-1 rounded border border-slate-300 flex items-center space-x-3 relative z-50">
                 <span className="font-mono text-slate-800 font-bold tracking-wider text-sm select-all">
                   {showPassword ? password : '•'.repeat(password.length)}
                 </span>
                 
-                <div className="flex items-center space-x-1 border-l border-slate-300 pl-2">
+                <div className="flex items-center space-x-1 border-l border-slate-300 pl-2 relative z-50">
+                  {/* FIXED: Switched to onPointerDown and increased padding for easier clicking */}
                   <button 
-                    onClick={togglePassword}
-                    className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-200 rounded transition-colors z-20"
+                    onPointerDown={togglePassword}
+                    onClick={(e) => e.stopPropagation()}
+                    className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-200 rounded transition-colors cursor-pointer"
                     title={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
+
                   <button 
-                    onClick={handleCopy}
-                    className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-200 rounded transition-colors relative z-20"
+                    onPointerDown={handleCopy}
+                    onClick={(e) => e.stopPropagation()}
+                    className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-200 rounded transition-colors relative cursor-pointer"
                     title="Copy password"
                   >
                     <Copy size={16} />
