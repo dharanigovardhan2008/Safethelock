@@ -15,16 +15,28 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   const [isFlipped, setIsFlipped] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
-  // Changed from PointerEvent to MouseEvent
   const handleCopy = async (e: React.MouseEvent, text: string, field: string) => {
     e.preventDefault();
-    e.stopPropagation(); // Prevents the card from flipping
+    e.stopPropagation();
     if (!text) return;
     try {
       await navigator.clipboard.writeText(text);
       setCopiedField(field);
       setTimeout(() => setCopiedField(null), 2000);
     } catch (err) {}
+  };
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("Delete clicked for ID:", id); // Check your browser console!
+    onDelete(id);
+  };
+
+  const handleEdit = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onEdit(id);
   };
 
   const handleCardClick = (flipTo: boolean) => {
@@ -40,8 +52,12 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
         <span className="text-xs text-white/90 truncate font-mono">{value || '—'}</span>
       </div>
       {value && (
-        // Replaced onPointerDownCapture with onClick
-        <button onClick={(e) => handleCopy(e, value, field)} className="p-1.5 text-slate-500 hover:text-white transition-colors relative z-50">
+        <button 
+          type="button"
+          onPointerDown={(e) => e.stopPropagation()} // Stops Framer Motion from swallowing the click
+          onClick={(e) => handleCopy(e, value, field)} 
+          className="p-1.5 text-slate-500 hover:text-white transition-colors relative z-50"
+        >
           {copiedField === field ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
         </button>
       )}
@@ -55,22 +71,21 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
         {/* FRONT SIDE */}
         <div onClick={() => handleCardClick(true)} className={cn("absolute inset-0 rounded-2xl overflow-hidden cursor-pointer", gradient)} style={{ backfaceVisibility: 'hidden' }}>
           <div className="absolute inset-0 opacity-20 mix-blend-overlay pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 50% 0%, #ffffff 0%, transparent 70%)' }}></div>
+          
           {isEditMode && (
             <div className="absolute inset-0 z-[9999] bg-slate-950/80 backdrop-blur-md flex flex-col items-center justify-center border-[3px] border-indigo-400 rounded-2xl animate-in fade-in duration-200">
               <div className="bg-indigo-500 p-4 rounded-full mb-3"><Edit2 size={28} className="text-white" /></div><span className="text-white font-black tracking-widest uppercase text-sm">Click to Edit</span>
             </div>
           )}
+          
           <div className="absolute inset-0 p-5 flex flex-col z-10 pointer-events-none">
             <div className="flex justify-between items-start">
               <div className="p-2 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 shadow-inner"><Code2 className="text-white" size={20} /></div>
               {!isEditMode && (
-                // Replaced onPointerDownCapture with onClick
                 <button 
-                  onClick={(e) => { 
-                    e.preventDefault(); 
-                    e.stopPropagation(); 
-                    onDelete(id); 
-                  }} 
+                  type="button"
+                  onPointerDown={(e) => e.stopPropagation()} // Stops Framer Motion from swallowing the click
+                  onClick={handleDelete} 
                   className="pointer-events-auto p-2 bg-black/40 hover:bg-rose-600 rounded-full text-white/80 hover:text-white transition-all opacity-0 group-hover:opacity-100 border border-white/20 relative z-50"
                 >
                   <Trash2 size={14} />
@@ -99,31 +114,26 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
             
             <div className="mt-auto flex justify-between items-center pt-2">
               <div className="flex gap-2 relative z-50">
-                {/* Replaced onPointerDownCapture with onClick */}
                 <button 
-                  onClick={(e) => { 
-                    e.preventDefault(); 
-                    e.stopPropagation(); 
-                    onEdit(id); 
-                  }} 
+                  type="button"
+                  onPointerDown={(e) => e.stopPropagation()} // Stops Framer Motion from swallowing the click
+                  onClick={handleEdit} 
                   className="p-2 bg-white/5 hover:bg-indigo-500 rounded-lg text-slate-400 hover:text-white transition-colors"
                 >
                   <Edit2 size={14} />
                 </button>
                 <button 
-                  onClick={(e) => { 
-                    e.preventDefault(); 
-                    e.stopPropagation(); 
-                    onDelete(id); 
-                  }} 
+                  type="button"
+                  onPointerDown={(e) => e.stopPropagation()} // Stops Framer Motion from swallowing the click
+                  onClick={handleDelete} 
                   className="p-2 bg-white/5 hover:bg-rose-500 rounded-lg text-slate-400 hover:text-white transition-colors"
                 >
                   <Trash2 size={14} />
                 </button>
               </div>
               {liveUrl && (
-                {/* Replaced onPointerDownCapture with onClick */}
                 <a 
+                  onPointerDown={(e) => e.stopPropagation()} // Stops Framer Motion from swallowing the click
                   onClick={(e) => e.stopPropagation()} 
                   href={liveUrl.startsWith('http') ? liveUrl : `https://${liveUrl}`} 
                   target="_blank" 
