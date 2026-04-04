@@ -1,5 +1,4 @@
-
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Shield, Search, WalletCards, Edit2, Check, LogOut, LayoutDashboard, Lock } from 'lucide-react';
 import { PasswordCard } from './components/PasswordCard';
 import { AddPasswordModal, PasswordData } from './components/AddPasswordModal';
@@ -72,7 +71,9 @@ function MainApp() {
     try {
       if (data.id) await updateDoc(doc(db, 'passwords', data.id), { ...data, password: enc });
       else await addDoc(collection(db, 'passwords'), { ...data, password: enc, dateAdded: new Date().toLocaleDateString('en-US', { month: '2-digit', year: '2-digit' }), userId: user.uid });
-    } catch (e) {}
+    } catch (error: any) {
+      alert("Error saving password: " + error.message);
+    }
   };
 
   // SAVE PROJECT
@@ -86,7 +87,9 @@ function MainApp() {
     try {
       if (data.id) await updateDoc(doc(db, 'projects', data.id), encData);
       else await addDoc(collection(db, 'projects'), { ...encData, dateAdded: new Date().toLocaleDateString('en-US', { month: '2-digit', year: '2-digit' }), userId: user.uid });
-    } catch (e) {}
+    } catch (error: any) {
+      alert("Error saving project: " + error.message);
+    }
   };
 
   const filteredPasswords = passwords.filter(p => p.website.toLowerCase().includes(searchQuery.toLowerCase()) || p.username.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -154,7 +157,18 @@ function MainApp() {
               <div className="flex flex-col items-center justify-center py-24"><WalletCards size={48} className="text-slate-700 mb-4" /><h2 className="text-xl font-bold text-slate-300">Vault Empty</h2></div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 justify-items-center sm:justify-items-start">
-                {filteredPasswords.map((pwd) => <PasswordCard key={pwd.id} {...pwd} isEditMode={isEditMode} onEdit={(id) => { setEditingPassword(passwords.find(p => p.id === id) || null); setIsPwdModalOpen(true); setIsEditMode(false); }} onDelete={(id) => deleteDoc(doc(db, 'passwords', id))} />)}
+                {filteredPasswords.map((pwd) => (
+                  <PasswordCard 
+                    key={pwd.id} 
+                    {...pwd} 
+                    isEditMode={isEditMode} 
+                    onEdit={(id) => { setEditingPassword(passwords.find(p => p.id === id) || null); setIsPwdModalOpen(true); setIsEditMode(false); }} 
+                    onDelete={async (id) => { 
+                      try { await deleteDoc(doc(db, 'passwords', id)); } 
+                      catch (error: any) { alert("Failed to delete! " + error.message); } 
+                    }} 
+                  />
+                ))}
               </div>
             )}
           </>
@@ -175,7 +189,18 @@ function MainApp() {
               <div className="flex flex-col items-center justify-center py-24"><LayoutDashboard size={48} className="text-slate-700 mb-4" /><h2 className="text-xl font-bold text-slate-300">No Projects Found</h2></div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 justify-items-center sm:justify-items-start">
-                {filteredProjects.map((proj) => <ProjectCard key={proj.id} {...proj} isEditMode={isEditMode} onEdit={(id) => { setEditingProject(projects.find(p => p.id === id) || null); setIsProjModalOpen(true); setIsEditMode(false); }} onDelete={(id) => deleteDoc(doc(db, 'projects', id))} />)}
+                {filteredProjects.map((proj) => (
+                  <ProjectCard 
+                    key={proj.id} 
+                    {...proj} 
+                    isEditMode={isEditMode} 
+                    onEdit={(id) => { setEditingProject(projects.find(p => p.id === id) || null); setIsProjModalOpen(true); setIsEditMode(false); }} 
+                    onDelete={async (id) => { 
+                      try { await deleteDoc(doc(db, 'projects', id)); } 
+                      catch (error: any) { alert("Failed to delete project! Firebase Error: " + error.message); } 
+                    }} 
+                  />
+                ))}
               </div>
             )}
           </>
