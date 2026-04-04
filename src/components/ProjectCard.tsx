@@ -15,7 +15,6 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   const [isFlipped, setIsFlipped] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
-  // Exact match to PasswordCard
   const handleCopy = async (e: React.PointerEvent, text: string, field: string) => {
     e.stopPropagation();
     try {
@@ -28,8 +27,11 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   };
 
   const handleCardClick = (flipTo: boolean) => {
-    if (isEditMode) onEdit(id);
-    else setIsFlipped(flipTo);
+    if (isEditMode) {
+      onEdit(id);
+    } else {
+      setIsFlipped(flipTo);
+    }
   };
 
   const embossedText = {
@@ -38,7 +40,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
 
   const ServiceRow = ({ icon: Icon, name, value, field }: any) => (
     <div className="flex items-center justify-between py-1.5 border-b border-white/5 last:border-0 pointer-events-auto">
-      <div className="flex items-center gap-3 overflow-hidden pointer-events-none">
+      <div className="flex items-center gap-3 overflow-hidden">
         <Icon className="text-slate-300 shrink-0 drop-shadow-sm" size={14} />
         <span className="text-[10px] font-bold text-slate-300 tracking-wider w-16 shrink-0 drop-shadow-sm">{name}</span>
         <span className="text-xs text-[#f8f9fa] truncate font-mono drop-shadow-sm">{value || '—'}</span>
@@ -56,8 +58,10 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
 
   return (
     <div className="relative group w-[340px] h-[240px] transition-transform duration-300 hover:-translate-y-2" style={{ perspective: '1200px' }}>
-      <motion.div className="w-full h-full relative rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.6)] group-hover:shadow-[0_30px_60px_rgba(0,0,0,0.7)] transition-shadow duration-300 ring-1 ring-white/20" initial={false} animate={{ rotateY: isFlipped ? 180 : 0 }} transition={{ duration: 0.7, type: "spring", stiffness: 200, damping: 20 }} style={{ transformStyle: 'preserve-3d' }}>
-        
+      <motion.div
+        className="w-full h-full relative rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.6)] group-hover:shadow-[0_30px_60px_rgba(0,0,0,0.7)] transition-shadow duration-300 ring-1 ring-white/20"
+        initial={false} animate={{ rotateY: isFlipped ? 180 : 0 }} transition={{ duration: 0.7, type: "spring", stiffness: 200, damping: 20 }} style={{ transformStyle: 'preserve-3d' }}
+      >
         {/* ================= FRONT SIDE ================= */}
         <div onClick={() => handleCardClick(true)} className={cn("absolute inset-0 rounded-2xl overflow-hidden cursor-pointer", gradient)} style={{ backfaceVisibility: 'hidden' }}>
           
@@ -77,6 +81,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
                 <Code2 className="text-white w-5 h-5" />
               </div>
               
+              {/* DELETE BUTTON EXACTLY AS IN PASSWORD CARD */}
               {!isEditMode && (
                 <button 
                   onPointerDownCapture={(e) => { e.stopPropagation(); onDelete(id); }}
@@ -113,17 +118,18 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
           
           <div className="absolute inset-0 bg-black/40 pointer-events-none backdrop-blur-[2px]"></div>
 
-          <div className="w-full h-8 bg-black/20 border-b border-white/10 flex items-center px-4 relative z-10">
+          <div className="w-full h-8 bg-black/20 border-b border-white/10 flex items-center px-4 relative z-10 pointer-events-none">
             <span className="text-[10px] font-black tracking-widest text-indigo-300 uppercase drop-shadow-sm">Connected Services</span>
           </div>
           
-          <div className="px-4 py-2 pb-4 flex-1 flex flex-col relative z-10 pointer-events-none">
+          {/* Removed pointer-events-none from here so clicks register normally */}
+          <div className="px-4 py-2 pb-4 flex-1 flex flex-col relative z-10">
             <ServiceRow icon={FaGithub} name="GITHUB" value={github} field="github" />
             <ServiceRow icon={SiFirebase} name="FIREBASE" value={firebase} field="firebase" />
             <ServiceRow icon={SiVercel} name="VERCEL" value={vercel} field="vercel" />
             <ServiceRow icon={FaAws} name="AWS" value={aws} field="aws" />
             
-            <div className="mt-auto flex justify-between items-center pt-2 pointer-events-auto">
+            <div className="mt-auto flex justify-between items-center pt-2">
               <div className="flex gap-2 relative z-50">
                 <button 
                   onPointerDownCapture={(e) => { e.stopPropagation(); onEdit(id); }}
