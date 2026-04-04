@@ -31,7 +31,8 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   };
 
   const ServiceRow = ({ icon: Icon, name, value, field }: any) => (
-    <div className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
+    // Changed py-2 to py-1.5 to save a little vertical space
+    <div className="flex items-center justify-between py-1.5 border-b border-white/5 last:border-0">
       <div className="flex items-center gap-3 overflow-hidden">
         <Icon className="text-slate-400 shrink-0" size={14} />
         <span className="text-[10px] font-bold text-slate-400 tracking-wider w-16 shrink-0">{name}</span>
@@ -46,7 +47,8 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   );
 
   return (
-    <div className="relative group w-[340px] h-[215px] transition-transform duration-300 hover:-translate-y-2" style={{ perspective: '1200px' }}>
+    // Increased height from h-[215px] to h-[240px] here
+    <div className="relative group w-[340px] h-[240px] transition-transform duration-300 hover:-translate-y-2" style={{ perspective: '1200px' }}>
       <motion.div className="w-full h-full relative rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.6)] group-hover:shadow-[0_30px_60px_rgba(0,0,0,0.7)] transition-shadow duration-300 ring-1 ring-white/20" initial={false} animate={{ rotateY: isFlipped ? 180 : 0 }} transition={{ duration: 0.7, type: "spring", stiffness: 200, damping: 20 }} style={{ transformStyle: 'preserve-3d' }}>
         
         {/* FRONT SIDE */}
@@ -76,7 +78,8 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
         {/* BACK SIDE (Dev Project Stats) */}
         <div onClick={() => handleCardClick(false)} className="absolute inset-0 rounded-2xl flex flex-col overflow-hidden cursor-pointer bg-[#0a0f1a] ring-1 ring-white/10" style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
           <div className="w-full h-8 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 border-b border-white/5 flex items-center px-4"><span className="text-[10px] font-black tracking-widest text-indigo-400 uppercase">Connected Services</span></div>
-          <div className="px-4 py-2 flex-1 flex flex-col relative z-10">
+          {/* Added pb-4 so the buttons have padding from the bottom border */}
+          <div className="px-4 py-2 pb-4 flex-1 flex flex-col relative z-10">
             <ServiceRow icon={FaGithub} name="GITHUB" value={github} field="github" />
             <ServiceRow icon={SiFirebase} name="FIREBASE" value={firebase} field="firebase" />
             <ServiceRow icon={SiVercel} name="VERCEL" value={vercel} field="vercel" />
