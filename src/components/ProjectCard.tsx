@@ -15,14 +15,16 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   const [isFlipped, setIsFlipped] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
+  // Exact match to PasswordCard
   const handleCopy = async (e: React.PointerEvent, text: string, field: string) => {
     e.stopPropagation();
-    if (!text) return;
     try {
       await navigator.clipboard.writeText(text);
       setCopiedField(field);
       setTimeout(() => setCopiedField(null), 2000);
-    } catch (err) {}
+    } catch (err) {
+      console.error("Failed to copy", err);
+    }
   };
 
   const handleCardClick = (flipTo: boolean) => {
@@ -30,7 +32,6 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
     else setIsFlipped(flipTo);
   };
 
-  // Taken from PasswordCard: Gives text that premium stamped/embossed look
   const embossedText = {
     textShadow: '0px 1px 1px rgba(255,255,255,0.3), 0px -1px 1px rgba(0,0,0,0.8)'
   };
@@ -45,10 +46,9 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
       {value && (
         <button 
           onPointerDownCapture={(e) => handleCopy(e, value, field)} 
-          onClick={(e) => e.stopPropagation()}
           className="p-1.5 text-slate-400 hover:text-white transition-colors relative z-50 active:scale-95"
         >
-          {copiedField === field ? <Check size={14} className="text-emerald-400 pointer-events-none" /> : <Copy size={14} className="pointer-events-none" />}
+          {copiedField === field ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
         </button>
       )}
     </div>
@@ -61,7 +61,6 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
         {/* ================= FRONT SIDE ================= */}
         <div onClick={() => handleCardClick(true)} className={cn("absolute inset-0 rounded-2xl overflow-hidden cursor-pointer", gradient)} style={{ backfaceVisibility: 'hidden' }}>
           
-          {/* Background overlays from PasswordCard */}
           <div className="absolute inset-0 opacity-20 mix-blend-overlay pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 50% 0%, #ffffff 0%, transparent 70%)' }}></div>
           <div className="absolute inset-0 opacity-40 pointer-events-none" style={{ background: 'linear-gradient(115deg, transparent 20%, rgba(255,255,255,0.3) 25%, transparent 35%, transparent 45%, rgba(255,255,255,0.1) 50%, transparent 60%)' }}></div>
 
@@ -81,12 +80,10 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
               {!isEditMode && (
                 <button 
                   onPointerDownCapture={(e) => { e.stopPropagation(); onDelete(id); }}
-                  onClick={(e) => e.stopPropagation()} // Extra safety
                   className="pointer-events-auto p-2 bg-black/40 hover:bg-rose-600 rounded-full text-white/80 hover:text-white transition-all opacity-0 group-hover:opacity-100 border border-white/20 backdrop-blur-md shadow-xl z-50 active:scale-95"
                   title="Delete Project"
                 >
-                  {/* pointer-events-none added to SVG so it doesn't swallow clicks */}
-                  <Trash2 size={14} className="pointer-events-none" />
+                  <Trash2 size={14} />
                 </button>
               )}
             </div>
@@ -114,7 +111,6 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
         {/* ================= BACK SIDE ================= */}
         <div onClick={() => handleCardClick(false)} className={cn("absolute inset-0 rounded-2xl flex flex-col overflow-hidden cursor-pointer ring-1 ring-white/20", gradient)} style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
           
-          {/* Darkens the background gradient so text is readable */}
           <div className="absolute inset-0 bg-black/40 pointer-events-none backdrop-blur-[2px]"></div>
 
           <div className="w-full h-8 bg-black/20 border-b border-white/10 flex items-center px-4 relative z-10">
@@ -131,29 +127,26 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
               <div className="flex gap-2 relative z-50">
                 <button 
                   onPointerDownCapture={(e) => { e.stopPropagation(); onEdit(id); }}
-                  onClick={(e) => e.stopPropagation()}
                   className="p-2 bg-white/10 hover:bg-indigo-500 rounded-lg text-slate-300 hover:text-white transition-colors active:scale-95 border border-white/10 backdrop-blur-md shadow-md"
                 >
-                  <Edit2 size={14} className="pointer-events-none" />
+                  <Edit2 size={14} />
                 </button>
                 <button 
                   onPointerDownCapture={(e) => { e.stopPropagation(); onDelete(id); }}
-                  onClick={(e) => e.stopPropagation()}
                   className="p-2 bg-white/10 hover:bg-rose-500 rounded-lg text-slate-300 hover:text-white transition-colors active:scale-95 border border-white/10 backdrop-blur-md shadow-md"
                 >
-                  <Trash2 size={14} className="pointer-events-none" />
+                  <Trash2 size={14} />
                 </button>
               </div>
               {liveUrl && (
                 <a 
                   onPointerDownCapture={(e) => e.stopPropagation()} 
-                  onClick={(e) => e.stopPropagation()}
                   href={liveUrl.startsWith('http') ? liveUrl : `https://${liveUrl}`} 
                   target="_blank" 
                   rel="noreferrer" 
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500 text-emerald-400 hover:text-white rounded-lg text-[10px] font-bold tracking-widest uppercase transition-colors relative z-50 active:scale-95 border border-emerald-500/30 backdrop-blur-md shadow-md"
                 >
-                  Live Link <ExternalLink size={12} className="pointer-events-none" />
+                  Live Link <ExternalLink size={12} />
                 </a>
               )}
             </div>
