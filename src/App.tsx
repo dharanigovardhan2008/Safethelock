@@ -36,7 +36,8 @@ function MainApp() {
       snapshot.forEach((d) => {
         let p = d.data().password;
         try { const bytes = CryptoJS.AES.decrypt(p, ENCRYPTION_KEY); const t = bytes.toString(CryptoJS.enc.Utf8); if(t) p = t; } catch(e){}
-        loaded.push({ id: d.id, ...d.data(), password: p } as PasswordData);
+        // FIX: Put id: d.id at the END so it overwrites any accidental empty IDs saved in Firestore
+        loaded.push({ ...d.data(), password: p, id: d.id } as PasswordData);
       });
       setPasswords(loaded.sort((a, b) => b.dateAdded.localeCompare(a.dateAdded)));
     });
@@ -48,7 +49,8 @@ function MainApp() {
         ['github', 'firebase', 'vercel', 'aws'].forEach(field => {
           try { if(data[field]) { const bytes = CryptoJS.AES.decrypt(data[field], ENCRYPTION_KEY); const t = bytes.toString(CryptoJS.enc.Utf8); if(t) data[field] = t; } } catch(e){}
         });
-        loaded.push({ id: d.id, ...data } as ProjectData);
+        // FIX: Put id: d.id at the END so it overwrites any accidental empty IDs saved in Firestore
+        loaded.push({ ...data, id: d.id } as ProjectData);
       });
       setProjects(loaded.sort((a, b) => b.dateAdded.localeCompare(a.dateAdded)));
     });
@@ -60,8 +62,13 @@ function MainApp() {
     const user = auth.currentUser; if (!user) return;
     const enc = CryptoJS.AES.encrypt(data.password, ENCRYPTION_KEY).toString();
     try {
-      if (data.id) await updateDoc(doc(db, 'passwords', data.id), { ...data, password: enc });
-      else await addDoc(collection(db, 'passwords'), { ...data, password: enc, dateAdded: new Date().toLocaleDateString('en-US', { month: '2-digit', year: '2-digit' }), userId: user.uid });
+      const saveData = { ...data, password: enc };
+      if (data.id) {
+        await updateDoc(doc(db, 'passwords', data.id), saveData);
+      } else {
+        delete (saveData as any).id; // Prevent saving empty ID
+        await addDoc(collection(db, 'passwords'), { ...saveData, dateAdded: new Date().toLocaleDateString('en-US', { month: '2-digit', year: '2-digit' }), userId: user.uid });
+      }
     } catch (error: any) { alert("Error: " + error.message); }
   };
 
@@ -72,8 +79,12 @@ function MainApp() {
       if(encData[f]) encData[f] = CryptoJS.AES.encrypt(encData[f], ENCRYPTION_KEY).toString();
     });
     try {
-      if (data.id) await updateDoc(doc(db, 'projects', data.id), encData);
-      else await addDoc(collection(db, 'projects'), { ...encData, dateAdded: new Date().toLocaleDateString('en-US', { month: '2-digit', year: '2-digit' }), userId: user.uid });
+      if (data.id) {
+        await updateDoc(doc(db, 'projects', data.id), encData);
+      } else {
+        delete encData.id; // Prevent saving empty ID
+        await addDoc(collection(db, 'projects'), { ...encData, dateAdded: new Date().toLocaleDateString('en-US', { month: '2-digit', year: '2-digit' }), userId: user.uid });
+      }
     } catch (error: any) { alert("Error: " + error.message); }
   };
 
@@ -136,7 +147,7 @@ function MainApp() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 justify-items-center sm:justify-items-start">
                 {filteredPasswords.map((pwd) => (
-                  <PasswordCard key={pwd.id} {...pwd} isEditMode={isEditMode} onEdit={(id) => { setEditingPassword(passwords.find(p => p.id === id) || null); setIsPwdModalOpen(true); setIsEditMode(false); }} onDelete={(id) => deleteDoc(doc(db, 'passwords', id))} />
+                  <PasswordCard key={pwd.id} {...pwd} isEditMode={isEditMode} onEdit={(id) => { setEditingPassword(passwords.find(p => p.id === id) || null); setIsPwdModalOpen(true); setIsEditMode(false); }} onDelete={async (id) => { try { await deleteDoc(doc(db, 'passwords', id)); } catch(e:any){ alert(e.message); } }} />
                 ))}
               </div>
             )}
@@ -167,13 +178,10 @@ function MainApp() {
                       setIsEditMode(false); 
                     }} 
                     onDelete={async (id) => { 
-                      console.log("Deleting Project ID:", id); // Verify ID exists
-                      if (!id) return alert("Error: ID is missing!");
+                      if (!id) return alert("ID is STILL missing! Something is very wrong.");
                       try { 
                         await deleteDoc(doc(db, 'projects', id)); 
-                        console.log("Delete Successful!");
                       } catch (error: any) { 
-                        console.error(error);
                         alert("Delete failed! " + error.message); 
                       } 
                     }} 
