@@ -28,8 +28,6 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   const handleDelete = (e: React.MouseEvent | React.PointerEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    // This popup proves the button click works. 
-    // If it shows up but the card doesn't delete, your Firebase Rules are blocking it!
     const isConfirmed = window.confirm(`Are you sure you want to delete "${projectName}"?`);
     if (isConfirmed) {
       onDelete(id);
@@ -62,7 +60,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
         <button 
           type="button"
           onClick={(e) => handleCopy(e, value, field)}
-          onPointerDown={(e) => e.stopPropagation()} // Overrides Framer Motion
+          onPointerDown={(e) => e.stopPropagation()} 
           className="p-1.5 text-slate-400 hover:text-white transition-colors relative z-50 active:scale-95"
         >
           {copiedField === field ? <Check size={14} className="pointer-events-none text-emerald-400" /> : <Copy size={14} className="pointer-events-none" />}
@@ -98,8 +96,8 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
                 <button 
                   type="button"
                   onClick={handleDelete}
-                  onPointerDown={(e) => e.stopPropagation()} // Prevents Framer Motion from flipping the card
-                  className="pointer-events-auto p-2 bg-black/40 hover:bg-rose-600 rounded-full text-white/80 hover:text-white transition-all opacity-0 group-hover:opacity-100 border border-white/20 backdrop-blur-md shadow-xl z-50 active:scale-95"
+                  onPointerDown={(e) => e.stopPropagation()} 
+                  className="pointer-events-auto p-2 bg-black/40 hover:bg-rose-600 rounded-full text-white/80 hover:text-white transition-all opacity-0 group-hover:opacity-100 border border-white/20 backdrop-blur-md shadow-xl z-50 active:scale-95 cursor-pointer"
                   title="Delete Project"
                 >
                   <Trash2 size={14} className="pointer-events-none" />
@@ -147,16 +145,16 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
                 <button 
                   type="button"
                   onClick={handleEdit}
-                  onPointerDown={(e) => e.stopPropagation()} // Overrides Framer Motion
-                  className="p-2 bg-white/10 hover:bg-indigo-500 rounded-lg text-slate-300 hover:text-white transition-colors active:scale-95 border border-white/10 backdrop-blur-md shadow-md"
+                  onPointerDown={(e) => e.stopPropagation()} 
+                  className="p-2 bg-white/10 hover:bg-indigo-500 rounded-lg text-slate-300 hover:text-white transition-colors active:scale-95 border border-white/10 backdrop-blur-md shadow-md cursor-pointer"
                 >
                   <Edit2 size={14} className="pointer-events-none" />
                 </button>
                 <button 
                   type="button"
                   onClick={handleDelete}
-                  onPointerDown={(e) => e.stopPropagation()} // Overrides Framer Motion
-                  className="p-2 bg-white/10 hover:bg-rose-500 rounded-lg text-slate-300 hover:text-white transition-colors active:scale-95 border border-white/10 backdrop-blur-md shadow-md"
+                  onPointerDown={(e) => e.stopPropagation()} 
+                  className="p-2 bg-white/10 hover:bg-rose-500 rounded-lg text-slate-300 hover:text-white transition-colors active:scale-95 border border-white/10 backdrop-blur-md shadow-md cursor-pointer"
                 >
                   <Trash2 size={14} className="pointer-events-none" />
                 </button>
@@ -164,11 +162,11 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
               {liveUrl && (
                 <a 
                   onClick={(e) => e.stopPropagation()}
-                  onPointerDown={(e) => e.stopPropagation()} // Overrides Framer Motion
+                  onPointerDown={(e) => e.stopPropagation()} 
                   href={liveUrl.startsWith('http') ? liveUrl : `https://${liveUrl}`} 
                   target="_blank" 
                   rel="noreferrer" 
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500 text-emerald-400 hover:text-white rounded-lg text-[10px] font-bold tracking-widest uppercase transition-colors relative z-50 active:scale-95 border border-emerald-500/30 backdrop-blur-md shadow-md"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500 text-emerald-400 hover:text-white rounded-lg text-[10px] font-bold tracking-widest uppercase transition-colors relative z-50 active:scale-95 border border-emerald-500/30 backdrop-blur-md shadow-md cursor-pointer"
                 >
                   Live Link <ExternalLink size={12} className="pointer-events-none" />
                 </a>
